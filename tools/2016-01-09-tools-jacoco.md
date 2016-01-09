@@ -4,7 +4,9 @@ Get test units coverage
 Environment
 ------
 > Espresso
+
 > Android Studio
+
 > Jacoco
 
 How to do
@@ -69,6 +71,7 @@ public class JUnitJacocoTestRunner extends AndroidJUnitRunner {
 ps:
 1. The method *getAgent* is one static method of RunTime Class
 ![](/imgs/20160109_1.png)
+
 2. The method *dump* belongs to interface IAgent, which is used to collect data, I guess.
 ![](/imgs/20160109_2.png)
 
