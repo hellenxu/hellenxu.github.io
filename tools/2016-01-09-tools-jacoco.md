@@ -69,6 +69,7 @@ public class JUnitJacocoTestRunner extends AndroidJUnitRunner {
 }
 ```
 ps:
+
 1. The method *getAgent* is one static method of RunTime Class
 ![](/imgs/20160109_1.png)
 
