@@ -10,7 +10,7 @@ Part One: How to use ViewDragHelper
 -----
 Usually, ViewDragHelper is used within a ViewGroup, as a tool to handle dragging events. Here, we use a custom ViewGroup that extends LinearLayout to learn how to use ViewDragHelper.
 
-1. Step one: create a custom ViewGroup ViewDragLinearLayout as well as an instance of ViewDragHelper in constructor function.
++ Step one: create a custom ViewGroup ViewDragLinearLayout as well as an instance of ViewDragHelper in constructor function.
 ```java
 public class ViewDragLinearLayout extends LinearLayout {
     private static final String TAG = ViewDragLinearLayout.class.getSimpleName();
@@ -30,7 +30,7 @@ public class ViewDragLinearLayout extends LinearLayout {
     }
 }
 ```
-2. Step two: create an inner class which extends ViewDragHelper.Callback.
++ Step two: create an inner class which extends ViewDragHelper.Callback.
 ```java
 public class ViewDragLinearLayout extends LinearLayout {
     ...
