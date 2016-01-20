@@ -30,7 +30,7 @@ public class ViewDragLinearLayout extends LinearLayout {
     }
 }
 ```
-+ Step two: create an inner class which extends ViewDragHelper.Callback.
++ Step two: create an inner class which extends ViewDragHelper.Callback, and then override three methods: 1) tryCaptureView; 2) clampViewPositionVertical; 3) clampViewPositionHorizontal.
 ```java
 public class ViewDragLinearLayout extends LinearLayout {
     ...
@@ -39,7 +39,35 @@ public class ViewDragLinearLayout extends LinearLayout {
         public boolean tryCaptureView(View child, int pointerId){
             return true;
         }
+        
+        @Override
+        public int clampViewPositionHorizontal(View child, int left, int dx) {
+            final int leftPadding = getPaddingLeft();
+            final int maxLeft = getWidth() -leftPadding - child.getWidth();
+            return Math.max(leftPadding, Math.min(maxLeft, left));
+        }
+        
+        @Override
+        public int clampViewPositionVertical(View child, int top, int dy) {
+            final int topPadding = getPaddingTop();
+            final int maxTop = getHeight() - topPadding - child.getHeight();
+            return Math.max(topPadding, Math.min(maxTop, top));
+        }
     }
     ...
 }
 ```
++ Step three: use this custom ViewGroup, ViewDragLinearLayout, in a layout file.
+```xml
+	<com.six.newfeatures.DraggingView xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent"
+                  android:orientation="vertical">
+    	<TextView android:layout_width="80dp"
+    	          android:layout_height="80dp"
+    	          android:background="@android:color/holo_blue_light"/>
+    </com.six.newfeatures.DraggingView>
+```
+
+Now, it is to launch the app and see how ViewDragHelper works.
+
