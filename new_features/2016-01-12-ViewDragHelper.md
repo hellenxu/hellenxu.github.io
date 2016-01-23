@@ -72,15 +72,3 @@ public class ViewDragLinearLayout extends LinearLayout {
 Now, it is time to launch the app and see how ViewDragHelper works. 
 Click [here](https://github.com/hellenxu/new_features/blob/master/app/src/main/java/com/six/newfeatures/DraggingView.java) to see the whole sample.
 
-Part Two: Common methods of ViewDragHelper
-------
-+ ViewDragHelper.processTouchEvent(MotionEvent ev)
-
-+ ViewDragHelper.shouldInterceptTouchEvent(MotionEvent ev)
-
-+ ViewDragHelper.Callback
-
-
-Part Three: How it works
-------
-
