@@ -8,6 +8,33 @@ Now we are going to talk about somethings about it as follows:
 
 Part Two: Common methods of ViewDragHelper
 ------
++ ViewDragHelper.abort()
+This method cancel as well as abort all motion in progress and jump to the end of any animation.
+
++ ViewDragHelper.cancel()
+Calling this method is equivalent to processing motion events which are canceled.
+
++ ViewDragHelper.captureChildView(View childView, int activePointerId)
+You can capture one specific child view by calling this method, and I usually use it within the onFinishInflate method of a parent view. Also, you need to use this method with tryCaptureView of ViewDragHelper.Callback to completing capturing one specific child view rather than others.
+
+```java
+    @Override
+    protected void onFinishInflate() {
+        super.onFinishInflate();
+        mDragView = getChildAt(0);
+        mViewDragHelper.captureChildView(mDragView, mViewDragHelper.getActivePointerId());
+    }
+
+    private final class DragCallback extends ViewDragHelper.Callback {
+    ...
+        @Override
+        public boolean tryCaptureView(View child, int pointerId) {
+            return child.equals(mDragView);
+        }
+    ...
+    }
+```
+
 + ViewDragHelper.processTouchEvent(MotionEvent ev)
 ViewDragHelper.processTouchEvent is used to process motion events received by the parent view, so we often call this method within the onTouchEvent of the parent view.
 ```java
