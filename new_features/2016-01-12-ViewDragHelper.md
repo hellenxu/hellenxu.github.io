@@ -70,5 +70,5 @@ public class ViewDragLinearLayout extends LinearLayout {
 ```
 
 Now, it is time to launch the app and see how ViewDragHelper works. 
-Click [here](https://github.com/hellenxu/new_features/blob/master/app/src/main/java/com/six/newfeatures/DraggingView.java) to see the whole sample.
+Click [here](https://github.com/hellenxu/new_features/blob/master/app/src/main/java/com/six/newfeatures/view/DraggingView.java) to see the whole sample.
 
