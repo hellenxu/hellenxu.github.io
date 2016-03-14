@@ -130,7 +130,7 @@ Now, we can create an DataInteraction using BeanMatcher.
 0X04: AsyncTask
 -------------
 There are some steps to test classes that extend AsyncTask.
-Step one:  add a static boolean flag within onPostExecute method to check whether this task is finished.
++ Step one:  add a static boolean flag within onPostExecute method to check whether this task is finished.
 ```java
     private class GetAsyncTask extends AsyncTask<Void, Integer, String> {
 
@@ -154,7 +154,8 @@ Step one:  add a static boolean flag within onPostExecute method to check whethe
     }
 ```
 
-Step two: create a class to implement IdlingResource interface.
++ Step two: create a class to implement IdlingResource interface.
+
 ```java
 	public class AsyncIdlingRes implements IdlingResource{
 	    private ResourceCallback resourceCallback;
@@ -180,7 +181,8 @@ Step two: create a class to implement IdlingResource interface.
 	}
 ```
 
-Step three: write the testing class.
++ Step three: write the testing class.
+
 ```java
 	@RunWith(AndroidJUnit4.class)
 	@LargeTest
