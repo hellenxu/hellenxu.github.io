@@ -163,6 +163,7 @@ No talking, just show the code;)
 ```
 
 ###Method No.6 ViewDragHelper
+Click [here](https://github.com/hellenxu/new_features/blob/master/app/src/main/java/com/six/newfeatures/view/DraggingView.java) to see a sample about how to use ViewDragHelper.
 
 ###Method No.7 Animation
 
