@@ -66,6 +66,28 @@ private void initValue(Context context, AttributeSet attrs) {
 
 ### Style
 
+Custom style could be inherited from one parent or no parent, just a simple collection of attributes.
+
+How to customize style?
+
+```xml
+<style name="LoadingDialog" parent="@android:style/Theme.Dialog">
+  <item name="android:windowBackground">@android:color/transparent</item>
+  <item name="android:windowIsFloating">true</item>
+  <item name="android:windowNoTitle">true</item>
+  <item name="android:windowContentOverlay">@null</item>
+</style>
+```
+
+How to use custom style?
+
+@style/name_of_custom_style
+
+How to get values of attributes of one specific style?
+
+Theme.obtainStyledAttributes()
+
+
 ### Theme
 
 
