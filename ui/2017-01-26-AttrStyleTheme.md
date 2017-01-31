@@ -90,6 +90,12 @@ Theme.obtainStyledAttributes()
 
 ### Theme
 
+When using a custom theme, we need to pay attention to declare name of its parent. Otherwise, systems will throw an IllegalStateException.
 
+```java
+1-30 22:09:54.706 2488-2488/com.six.tipsproject E/AndroidRuntime: FATAL EXCEPTION: main
+                                                                   Process: com.six.tipsproject, PID: 2488
+                                                                   java.lang.RuntimeException: Unable to start activity ComponentInfo{com.six.tipsproject/com.six.tipsproject.drawer.DrawerActivity}: java.lang.IllegalStateException: You need to use a Theme.AppCompat theme (or descendant) with this activity.
+```
 
 
