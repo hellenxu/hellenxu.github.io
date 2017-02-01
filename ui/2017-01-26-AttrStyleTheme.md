@@ -98,4 +98,29 @@ When using a custom theme, we need to pay attention to declare name of its paren
                                                                    java.lang.RuntimeException: Unable to start activity ComponentInfo{com.six.tipsproject/com.six.tipsproject.drawer.DrawerActivity}: java.lang.IllegalStateException: You need to use a Theme.AppCompat theme (or descendant) with this activity.
 ```
 
+### Inheritance of Style and Theme
 
+Custom style and theme can be defined by inheriting from one particular parent. There are two ways of inheritance:
+
+* declare parent by using parent attribute
+
+We can inherit styles or themes that are built into the platform through using parent attribute.
+
+```xml
+<style name="LoadingDialog" parent="@android:style/Theme.Dialog">
+  <item name="android:windowBackground">@android:color/transparent</item>
+  <item name="android:windowIsFloating">true</item>
+  <item name="android:windowNoTitle">true</item>
+  <item name="android:windowContentOverlay">@null</item>
+</style>
+```
+
+* prefix the name of parent
+
+If we want to inherit from styles or themes that defined by ourselves, we can just prefix the name of the style or theme that we want to inherit to, separated by a period.
+
+```xml
+<style name="LoadingDialog.Red">
+  <item name="android:windowBackground">@android:color/holo_red_light</item>
+</style>
+```
