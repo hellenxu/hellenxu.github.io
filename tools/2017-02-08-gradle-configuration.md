@@ -3,7 +3,7 @@ Gradle Basic
 
 0X00: General Configuration
 ------------
-1, Configure signature information
+1, Configure signing information
 Signature information is private, and it is not a good idea to store these information in build.gradle file as well as push them to version control system, like git, svn. Instead, it would be better to save them in a local configuration file, such as gradle.properties, local.properties or a custom configuration file that may need to write gradle task to read.
 Let's take saving signature information in local.properties for example.
 ```groovy
@@ -105,14 +105,20 @@ dependencies {
     testCompile rootProject.ext.dependencies["junit"]
 }
 ```
-0X01: Parameters Configuration
+0X01: NDK Configuration
 -------------
+In order to reduce the size of apk, it would be better to specify which cpu platform your app will support. For example, supporting 'armeabi', then your apk will contain armeabi folder only.
+```groovy
+android {
+defaultConfig {
+       ndk {
+           abiFilters 'armeabi'
+       }
+   }
+}
+```
 
-
-0X02: NDK Configuration
--------------
-
-0X03: Gradle Speeding Up
+0X02: Gradle Speeding Up
 -------------
 There are a few tips that can help us speed up gradle building.
 1, Enable daemon
