@@ -126,7 +126,7 @@ for (IMessage message : handler.getMessages(null, true)) {
 ```
 
 2. Annotation package:
-![Plugin Package Structure](/imgs/20181114_hugo_annotation_structure.png)
+![Plugin Package Structure](/imgs/20181119_hugo_annotation_structure.png)
 
 The annotation package is quite simple, and only includes one annotation class: DebugLog, which makes sense since this library is used to log info.
 Now, let’s just take a look at how it looks.
@@ -151,7 +151,96 @@ Apparently, DebugLog is applied to type, method and constructor on the class lev
 
 
 3. Runtime package:
+![Plugin Package Structure](/imgs/20181119_hugo_runtime_structure.png)
 
+Now, it’s the runtime package. Within this package, it has Hugo(这个应该是主要起作用的类), Strings(String的工具类), and BuildConfig(与). Let’s crack them one by one.
+3.1) Hugo.java
+This class uses several annotations of aspectJ: @Aspect, @Pointcut, @Around, and the main one is method Hugo#logAndExecute(ProceedingJoinPoint joinPoint) marked with annotation @Around. Others are basically helper methods.
+Well, let's dive into this method, logAndExecute().
+```java
+//Hugo#logAndExecute()
+@Around("method() || constructor()")
+public Object logAndExecute(ProceedingJoinPoint joinPoint) throws Throwable {
+  enterMethod(joinPoint); //construct printable string for class, method, param name and values
+
+  long startNanos = System.nanoTime();
+  Object result = joinPoint.proceed();
+  long stopNanos = System.nanoTime();
+  long lengthMillis = TimeUnit.NANOSECONDS.toMillis(stopNanos - startNanos);
+
+  exitMethod(joinPoint, result, lengthMillis); //construct printable string for return type
+
+  return result;
+}
+```
+
+Hugo#enterMethod
+```java
+private static void enterMethod(JoinPoint joinPoint) {
+  CodeSignature codeSignature = (CodeSignature) joinPoint.getSignature();
+
+  Class<?> cls = codeSignature.getDeclaringType();
+  String methodName = codeSignature.getName();
+  String[] parameterNames = codeSignature.getParameterNames();
+  Object[] parameterValues = joinPoint.getArgs();
+
+  StringBuilder builder = new StringBuilder("\u21E2 ");
+  builder.append(methodName).append('(');
+  for (int i = 0; i < parameterValues.length; i++) {
+    if (i > 0) {
+      builder.append(", ");
+    }
+    builder.append(parameterNames[i]).append('=');
+    builder.append(Strings.toString(parameterValues[i]));//change params into printable strings
+  }
+  builder.append(')');
+
+  if (Looper.myLooper() != Looper.getMainLooper()) {
+    builder.append(" [Thread:\"").append(Thread.currentThread().getName()).append("\"]");
+  }
+
+  Log.v(asTag(cls), builder.toString()); //asTag(cls) is used to get the tag of an anonymous class
+}
+```
+
+Basically, enterMethod is used to get all information that needed to print log: method name, parameter names and values.
+A). Get code signature from JoinPoint
+B). Get class, methodName, parameterNames, parameterValues
+C). Thread name if it’s the current thread is not main thread
+
+Hugo#exitMethod
+
+```java
+private static void exitMethod(JoinPoint joinPoint, Object result, long lengthMillis) {
+  Signature signature = joinPoint.getSignature();
+
+  Class<?> cls = signature.getDeclaringType();
+  String methodName = signature.getName();
+  boolean hasReturnType = signature instanceof MethodSignature
+      && ((MethodSignature) signature).getReturnType() != void.class; //check whether this method has void return type
+
+  StringBuilder builder = new StringBuilder("\u21E0 ")
+      .append(methodName)
+      .append(" [")
+      .append(lengthMillis)
+      .append("ms]");
+
+  if (hasReturnType) {
+    builder.append(" = ");
+    builder.append(Strings.toString(result));
+  }
+
+  Log.v(asTag(cls), builder.toString());
+}
+```
+
+Between enterMethod and exitMethod, it calculates time cost of ProceedingJoinPoint proceeding.
+
+3.2) Strings.java
+Strings is a util class that provides printable string.
+
+3.3) BuildConfig.java
+BuildConfig provides Hugo config information like: APPLICATION_ID, BUILD_TYPE,   FLAVOR, VERSION_CODE AND VERSION_NAME.
 
 
 #### 2.2 How does it work
