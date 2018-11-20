@@ -126,9 +126,33 @@ for (IMessage message : handler.getMessages(null, true)) {
 ```
 
 2. Annotation package:
+![Plugin Package Structure](/imgs/20181114_hugo_annotation_structure.png)
+
+The annotation package is quite simple, and only includes one annotation class: DebugLog, which makes sense since this library is used to log info.
+Now, let’s just take a look at how it looks.
+
+```java
+package hugo.weaving;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.CONSTRUCTOR;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.CLASS;
+
+@Target({TYPE, METHOD, CONSTRUCTOR}) @Retention(CLASS)
+public @interface DebugLog {
+}
+```
+
+Apparently, DebugLog is applied to type, method and constructor on the class level.
 
 
 3. Runtime package:
+
+
 
 #### 2.2 How does it work
 
