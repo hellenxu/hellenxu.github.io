@@ -153,7 +153,7 @@ Apparently, DebugLog is applied to type, method and constructor on the class lev
 3. Runtime package:
 ![Plugin Package Structure](/imgs/20181119_hugo_runtime_structure.png)
 
-Now, it’s the runtime package. Within this package, it has Hugo(这个应该是主要起作用的类), Strings(String的工具类), and BuildConfig(与). Let’s crack them one by one.
+Now, it’s the runtime package. Within this package, it has Hugo(the core class), Strings(Strings util), and BuildConfig(configuration info). Let’s crack them one by one.
 3.1) Hugo.java
 This class uses several annotations of aspectJ: @Aspect, @Pointcut, @Around, and the main one is method Hugo#logAndExecute(ProceedingJoinPoint joinPoint) marked with annotation @Around. Others are basically helper methods.
 Well, let's dive into this method, logAndExecute().
