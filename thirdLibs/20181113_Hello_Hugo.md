@@ -243,7 +243,78 @@ Strings is a util class that provides printable string.
 BuildConfig provides Hugo config information like: APPLICATION_ID, BUILD_TYPE,   FLAVOR, VERSION_CODE AND VERSION_NAME.
 
 
-#### 2.2 How does it work
+#### 2.2 How those three packages work together
+It’s HugoPlugin.groovy which connects all together. There is a task ‘JavaCompile’, and within its doLast section, that’s the key point to connect runtime and annotation packages.
+
+```groovy
+JavaCompile javaCompile = variant.javaCompile
+javaCompile.doLast {
+  String[] args = [
+      "-showWeaveInfo”,    //showWeaveInfo
+      "-1.5”,        //java5
+      "-inpath", javaCompile.destinationDir.toString(),
+      "-aspectpath", javaCompile.classpath.asPath,
+      "-d", javaCompile.destinationDir.toString(),
+      "-classpath", javaCompile.classpath.asPath,
+      "-bootclasspath", project.android.bootClasspath.join(File.pathSeparator)
+  ]
+  log.debug "ajc args: " + Arrays.toString(args)
+
+  MessageHandler handler = new MessageHandler(true);
+  new Main().run(args, handler);
+  for (IMessage message : handler.getMessages(null, true)) {
+    switch (message.getKind()) {
+      case IMessage.ABORT:
+      case IMessage.ERROR:
+      case IMessage.FAIL:
+        log.error message.message, message.thrown
+        break;
+      case IMessage.WARNING:
+        log.warn message.message, message.thrown
+        break;
+      case IMessage.INFO:
+        log.info message.message, message.thrown
+        break;
+      case IMessage.DEBUG:
+        log.debug message.message, message.thrown
+        break;
+    }
+  }
+}
+```
+
+Args are mostly from Options class from package ‘org.aspectj.weaver.loadtime’. For example, ‘-1.5’ means setting a boolean value of WeaverOption#java5.
+
+Okay, let's go through the whole flow by walking through JavaCompile task. There is a class called Javac in package org.apache.tools.ant.taskdefs; and every time when we running javac to compile java file into classes file, Hugo is going to iterate all annotated type, method, and classes to output logs.
+
+Firstly, Javac.
+
+```java
+//Source Code: Javac#compile()
+protected void compile() {
+    String compilerImpl = getCompiler();
+
+    if (compileList.length > 0) {
+    ...
+        CompilerAdapter adapter =
+            nestedAdapter != null ? nestedAdapter :
+            CompilerAdapterFactory.getCompiler(compilerImpl, this,
+                                               createCompilerClasspath());
+
+        // now we need to populate the compiler adapter
+        adapter.setJavac(this);
+
+        // finally, lets execute the compiler!!
+        if (adapter.execute()) {    //is used to parse
+            // Success
+            ...
+        } else {
+            // Fail path
+            ...
+        }
+    }
+}
+```
 
 
 ### Part Three: What we get from Hugo
