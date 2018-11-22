@@ -315,7 +315,48 @@ protected void compile() {
     }
 }
 ```
+Basically, within the compile method, CompilerAdapter#execute() will be called. But how does it create an instance of CompilerAdapter? Let's move to CompilerAdapterFactory to find out how the instance of CompilerAdapter is created.
+We found out within package of aj, there are two classes that implements CompilerAdapter interface：Ajc11CompilerAdapter and AjcCompilerAdapter. Then how CompilerAdapterFactory decide which type of instance is going to create? Are those two classes will be used?
+```java
+CompilerAdapter adapter =
+    nestedAdapter != null ? nestedAdapter :
+    CompilerAdapterFactory.getCompiler(compilerImpl, this, createCompilerClasspath());
+```
+From the code snippet above, we can see CompilerAdapterFactory#getCompiler() receives three arguments: 1) compilerImpl(it comes from Javac#getCompiler(), and usually returns "extJavac”); 2) this — is a ProjectComponent task; 3) compiler classpath (actually it returns the path of project)
 
+```java
+//Javac#createCompilerClasspath()
+public Path createCompilerClasspath() {
+    return facade.getImplementationClasspath(getProject());
+}
+
+//FacadeTaskHelper#getImplementationClasspath(getProject())
+public Path getImplementationClasspath(Project project) {
+    if (implementationClasspath == null) {
+        implementationClasspath = new Path(project);
+    }
+    return implementationClasspath;
+}
+```
+
+||ヽ(*￣▽￣*)ノミ|Ю then what will be the created compiler? Still remember the first argument compilerImpl, which is extJavac. So from the code snippet following, it will return an instance of JavacExternal.
+```java
+//CompilerAdapterFactory#getCompiler()
+public static CompilerAdapter getCompiler(String compilerType, Task task,
+                                          Path classpath)
+    throws BuildException {
+        ...
+        if (compilerType.equalsIgnoreCase("extJavac")) {
+            return new JavacExternal();
+        }
+        ...
+        return resolveClassName(compilerType,
+                                // Memory-Leak in line below
+                            task.getProject().createClassLoader(classpath));
+    }
+```
+
+What is JavacExternal? This class extends DefaultCompilerAdapter and DefaultCompilerAdapter implements CompilerAdapter.
 
 ### Part Three: What we get from Hugo
 #### 3.1 Build your own Hugo
