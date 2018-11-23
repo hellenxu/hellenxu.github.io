@@ -356,7 +356,100 @@ public static CompilerAdapter getCompiler(String compilerType, Task task,
     }
 ```
 
-What is JavacExternal? This class extends DefaultCompilerAdapter and DefaultCompilerAdapter implements CompilerAdapter.
+What is JavacExternal? This class extends DefaultCompilerAdapter and DefaultCompilerAdapter implements CompilerAdapter. execute() is the most important method of JavacExternal.
+
+Firstly, it creates an instance of Commandline, and passes the current javac executable to Commandline. Then call different methods based on the version of java.
+- setupJavacCommandlineSwitches(): for java1.1 or java1.2;
+- setupModernJavacCommandlineSwitches(): for java 1.3 and above.
+
+```java
+//JavacExternal#execute()
+public boolean execute() throws BuildException {
+    attributes.log("Using external javac compiler", Project.MSG_VERBOSE);
+
+    Commandline cmd = new Commandline();
+    cmd.setExecutable(getJavac().getJavacExecutable());
+    if (!assumeJava11() && !assumeJava12()) {
+        setupModernJavacCommandlineSwitches(cmd);
+    } else {
+        setupJavacCommandlineSwitches(cmd, true);
+    }
+    int firstFileName = assumeJava11() ? -1 : cmd.size();
+    logAndAddFilesToCompile(cmd);
+    //On VMS platform, we need to create a special java options file
+    //containing the arguments and classpath for the javac command.
+    //The special file is supported by the "-V" switch on the VMS JVM.
+    if (Os.isFamily("openvms")) {
+        return execOnVMS(cmd, firstFileName);
+    }
+    return
+            executeExternalCompile(cmd.getCommandline(), firstFileName,
+                    true)
+            == 0;
+}
+
+```
+
+Now, take a look at what is under the hood of setupModernJavacCommanlineSwitches(). In fact, this method will call setupJavacCommandlineSwitches(Commandline cmd, boolean useDebugLevel) directly.
+Thus, let's see the source code of this method.
+- 1.1: setupJavacCommandlineSwitches(Commandline cmd, boolean useDebugLevel);
+
+- 1.2: set arguments of commandline;
+
+1). Scenario One: Javac#getSource() != null and non-java1.3
+As comments in this class, "support for -source 1.1 and -source 1.2 has been added with JDK 1.4.2 and isn’t present in 1.5.0 or 1.6.0 either."
+when javac source is 1.5 or 1.6, attributes is null; then it will move to scenario two.
+
+2). Javac#getSource() == null or java1.3
+
+Now matter which situation, it will set the right argument value for the commandline by cmd.createArgument().setValue(s)
+
+- 1.3: return the instance of Commandline.
+
+```java
+//DefaultCompilerAdapter#setupModernJavacCommandlineSwitches(Commandline cmd)
+protected Commandline setupModernJavacCommandlineSwitches(Commandline cmd) {
+    setupJavacCommandlineSwitches(cmd, true);
+    if (attributes.getSource() != null && !assumeJava13()) {
+        cmd.createArgument().setValue("-source");
+        String source = attributes.getSource();
+        if (source.equals("1.1") || source.equals("1.2")) {
+            // support for -source 1.1 and -source 1.2 has been
+            // added with JDK 1.4.2 - and isn't present in 1.5.0
+            // or 1.6.0 either
+            cmd.createArgument().setValue("1.3");
+        } else {
+            cmd.createArgument().setValue(source);
+        }
+    } else if ((assumeJava15() || assumeJava16())
+               && attributes.getTarget() != null) {
+        String t = attributes.getTarget();
+        if (t.equals("1.1") || t.equals("1.2") || t.equals("1.3")
+            || t.equals("1.4")) {
+            String s = t;
+            if (t.equals("1.1")) {
+                // 1.5.0 doesn't support -source 1.1
+                s = "1.2";
+            }
+            attributes.log("", Project.MSG_WARN);
+            attributes.log("          WARNING", Project.MSG_WARN);
+            attributes.log("", Project.MSG_WARN);
+            attributes.log("The -source switch defaults to 1.5 in JDK 1.5 and 1.6.",
+                           Project.MSG_WARN);
+            attributes.log("If you specify -target " + t
+                           + " you now must also specify -source " + s
+                           + ".", Project.MSG_WARN);
+            attributes.log("Ant will implicitly add -source " + s
+                           + " for you.  Please change your build file.",
+                           Project.MSG_WARN);
+            cmd.createArgument().setValue("-source");
+            cmd.createArgument().setValue(s);
+        }
+    }
+    return cmd;
+}
+```
+
 
 ### Part Three: What we get from Hugo
 #### 3.1 Build your own Hugo
