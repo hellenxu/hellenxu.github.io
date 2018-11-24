@@ -457,6 +457,6 @@ protected Commandline setupModernJavacCommandlineSwitches(Commandline cmd) {
 #### 3.2 Scenario that can be applied with Hugo
 
 #### Part Four: References
-
-
+[JakeWharton Hugo](https://github.com/JakeWharton/hugo)
+[AspectJ docs](https://www.eclipse.org/aspectj/docs.php)
 
