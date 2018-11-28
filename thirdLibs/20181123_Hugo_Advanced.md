@@ -275,8 +275,17 @@ android.libraryVariants.all { variant ->
 ```
 
 2.1 Annotation
+AOP usually uses annotations to mark the entrance of point cuts, therefore we need an annotation class first.
+Annotation class is quiet simple, you just need to define RetentionPolicy and Target. For example:
+```java
+@Retention(RetentionPolicy.CLASS)
+@Target({ElementType.METHOD, ElementType.CONSTRUCTOR})
+    public @interface DebugTimeCost {
+}
+```
 
 2.2 Aspect
+
 
 2.3 Helper methods
 
