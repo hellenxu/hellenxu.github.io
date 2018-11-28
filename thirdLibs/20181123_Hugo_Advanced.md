@@ -207,6 +207,78 @@ protected Commandline setupModernJavacCommandlineSwitches(Commandline cmd) {
     return cmd;
 }
 ```
-#### Part Two: Build your own hugo
+
+#### Part Two: What we get from Hugo?
+1. Scenarios that can use aspectJ
+Logger, data persistence, behaviour monitoring, data validation, caching.
+
+2. How to make your own Hugo?
+2.0 Preparation
+Step One: add an android library module and configure build.gradle file of this new module.
+```groovy
+//build.gradle[timecost]
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.aspectj:aspectjtools:1.8.9'
+    }
+}
+
+dependencies {
+    //aj
+    implementation 'org.aspectj:aspectjrt:1.8.9'
+}
+```
+
+Step Two: configure JavaCompile task
+
+```groovy
+import org.aspectj.bridge.IMessage
+import org.aspectj.bridge.MessageHandler
+import org.aspectj.tools.ajc.Main
+
+android.libraryVariants.all { variant ->
+    JavaCompile javaCompile = variant.javaCompile
+    javaCompile.doLast {
+        String[] args = ["-showWeaveInfo",
+                         "-1.5",
+                         "-inpath", javaCompile.destinationDir.toString(),
+                         "-aspectpath", javaCompile.classpath.asPath,
+                         "-d", javaCompile.destinationDir.toString(),
+                         "-classpath", javaCompile.classpath.asPath,
+                         "-bootclasspath", project.android.bootClasspath.join(File.pathSeparator)]
+
+        MessageHandler handler = new MessageHandler(true)
+        new Main().run(args, handler)
+
+        def log = project.logger
+        for (IMessage message : handler.getMessages(null, true)) {
+            switch (message.getKind()) {
+                case IMessage.ABORT:
+                case IMessage.ERROR:
+                case IMessage.FAIL:
+                    log.error message.message, message.thrown
+                    break
+                case IMessage.WARNING:
+                case IMessage.INFO:
+                    log.info message.message, message.thrown
+                    break
+                case IMessage.DEBUG:
+                    log.debug message.message, message.thrown
+                    break
+            }
+        }
+    }
+}
+```
+
+2.1 Annotation
+
+2.2 Aspect
+
+2.3 Helper methods
+
 
 #### Part Three: References
