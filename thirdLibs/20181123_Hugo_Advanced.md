@@ -285,9 +285,44 @@ Annotation class is quiet simple, you just need to define RetentionPolicy and Ta
 ```
 
 2.2 Aspect
+Aspect is quite simple, and it basically is those codes which would like to insert into Pointcut.
+Then what is Pointcut? Pointcut is a mark which tells us where to insert codes.
 
+```java
+@Aspect
+public class TimeCost {
+    private static final String POINTCUT_METHOD = "execution(@ca.six.timecost.annotation.DebugTimeCost * *(..))";
+    private static final String POINTCUT_CONSTRUCTOR = "execution(@ca.six.timecost.annotation.DebugTimeCost *.new(..))";
+
+    @Pointcut(POINTCUT_METHOD)
+    public void method(){}
+
+    @Pointcut(POINTCUT_CONSTRUCTOR)
+    public void constructor() {}
+
+    @Around("method() || constructor()")
+    public Object weaveInfo(ProceedingJoinPoint joinPoint) throws Throwable {
+        MethodSignature methodSig = (MethodSignature) joinPoint.getSignature();
+        String clzName = methodSig.getDeclaringType().getSimpleName();
+        String methodName = methodSig.getMethod().getName();
+
+        TimeCostHelper timeHelper = new TimeCostHelper();
+        timeHelper.startTimer();
+        Object result = joinPoint.proceed();
+        timeHelper.stopTimer();
+        Logger.d(clzName, Logger.buildLog(methodName, timeHelper.getElapsed()));
+
+        return result;
+    }
+
+}
+```
+Like the sample above, we set two Pointcuts: one is methods with any arguments and any return value, annotated with @DebugTimeCost;
+the other is constructors with any arguments, annotated with @DebugTimeCost.
+These two pointcuts are execution type, which means it happens when annotated methods or constructors are executed.
+In the example above, we start to log the time at the beginning of execution of the pointcuts; when methods are proceeded, we log the finishing time to calculate how long a method takes to execute all codes within it.
 
 2.3 Helper methods
-
+In this calculate method time cost example, we have two helpers: one is to log start time, stop time and elapsed time; the other is to format output.
 
 #### Part Three: References
