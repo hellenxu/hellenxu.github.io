@@ -326,3 +326,6 @@ In the example above, we start to log the time at the beginning of execution of 
 In this calculate method time cost example, we have two helpers: one is to log start time, stop time and elapsed time; the other is to format output.
 
 #### Part Three: References
+[DocGuide](https://www.eclipse.org/aspectj/doc/released/progguide/starting-aspectj.html)
+[JoinPoints](https://www.eclipse.org/aspectj/doc/next/progguide/language-joinPoints.html)
+[Advice](https://www.eclipse.org/aspectj/doc/next/adk15notebook/ataspectj-pcadvice.html)
