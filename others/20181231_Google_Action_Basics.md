@@ -20,4 +20,15 @@ Under the hood, things work like the following ways:
 
 ### Part Three: Design and implement a simple conversation
 
-### References
+### Part Four: References
+[Codelabs](https://github.com/actions-on-google/codelabs-nodejs)
+
+[Guides](https://codelabs.developers.google.com/codelabs/actions-1/#0)
+
+[SSML](https://developers.google.com/actions/reference/ssml)
+
+[Conversation Components](https://designguidelines.withgoogle.com/conversation/conversational-components/chips.html)
+
+[Simulator](https://developers.google.com/actions/tools/simulator)
+
+[Helpers](https://developers.google.com/actions/assistant/helpers)
