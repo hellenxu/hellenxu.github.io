@@ -187,7 +187,7 @@ app.intent('favorite color', (conv, {color}) => {
         conv.ask(`<speak>Your lucky number is ${luckyNumber} .<audio src="${audioSound}></audio></speak>`);
     }
 
-    conv.close(‘Good bye, see you next time.');
+    conv.close('Good bye, see you next time.');
 });
 ```
 
