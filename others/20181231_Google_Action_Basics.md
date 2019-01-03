@@ -48,6 +48,149 @@ Why do we need to create a Dialogflow agent? The picture below tells you why.
 
 
 ### Part Three: Design and implement a simple conversation
+The Firebase Command Line Interface(CLI) will allow you to deploy your Actions project to Cloud Functions.
+
+#### Step One: Firebase tools and configuration
+
++ Install Firebase cli
+
+```shell
+npm -g install firebase-tools
+```
+
++ Login Firebase
+
+```shell
+firebase login
+```
+
++ Choose your project and install dependencies
+
+```shell
+firebase use <PROJECT_ID>
+```
+
+We can use firebase list to get all your project ids.
+
+![Firebase List](/imgs/20181231_firebase_list.png)
+
+Then install all dependencies by using:
+
+```shell
+npm install
+```
+
++ Deploy
+
+```shell
+firebase deploy
+```
+
++ Retrieve deployment url and set it in Dialogflow
+Open Firebase Console, Functions -> Dashboard:
+
+![Retrieve deployment url](/imgs/20181231_firebase_deploy_url.png)
+
+After that, we go to Dialogflow console and set it for webhook.
+
+![Dialogflow webhook](/imgs/20181231_dialogflow_webhook.png)
+
+Then the connection between firebase and dialogflow is established, and we can just update the local js file to handle all those intents.
+
+#### Step Two: A simple conversation
+Before starting a simple conversation, it would be better to take a look at the structure of a local firebase project first.
++ Structures of a Firebase Project
+
+A basic firebase project mainly contains three parts:
+1) index.js -- is to handle all intents;
+2) package.json -- include all dependencies of this project;
+3) node_modules -- a directory, including downloaded dependencies.
+
+
++ Initialization of a firebase project
+
+Here we use Visual Studio Code to complete initialization.
+1) Open the workplace in terminal.
+
+![Open terminal](/imgs/20181231_firebase_project_terminal.png)
+
+2) firebase init
+
+![Firebase Init](/imgs/20181231_firebase_init.png)
+
+Then follow all steps and choose options based on your requirements.
+
++ A simple Conversation
+— Greetings + deep link：Google assistant greetings + what’s your favourite colour?
+— handle intent：based on the user input, we reply the length of the colour as the lucky number
+— close conversation: Goodbye
+
++ Implement a simple conversation
+First of all, import classes.
+
+```js
+const {
+    dialogflow,
+    Permission,
+    Suggestions,
+    BasicCard,
+} = require('actions-on-google');
+
+```
+
+[index.js — ask for name, so we can show the user name next time they talk to us]
+
+```js
+app.intent('Default Welcome Intent', (conv) => {
+    const name = conv.user.storage.userName;
+
+    if(!name) {
+        conv.ask(new Permission({
+            context: 'Hi there, to get to know you better',
+            permissions: 'NAME',
+        }));
+    } else {
+        conv.ask(`Hi again, ${name}. What\'s your favorite color?`);
+    }
+
+});
+```
+
+
+[index.js — based on whether we get the permission of getting user names, we ask users in different ways.]
+
+```js
+app.intent('actions_intent_PERMISSION', (conv, params, permissionGranted) => {
+    if(!permissionGranted) {
+        conv.ask('Ok, no worries. What\'s your favorite color?');
+        conv.ask(new Suggestions('Blue', 'Red', 'Green'));
+    } else {
+        conv.user.storage.userName = conv.user.name.display;
+        conv.ask(`Thanks, ${conv.user.storage.userName}. What\'s your favorite color?`);
+        conv.ask(new Suggestions('Blue', 'Red', 'Green'));
+    }
+});
+```
+
+
+[index.js — tell users their luck numbers]
+
+```js
+app.intent('favorite color', (conv, {color}) => {
+    const luckyNumber = color.length;
+    const audioSound = 'https://actions.google.com/sounds/v1/cartoon/crazy_dinner_bell.ogg';
+    // Respond with the user's lucky number and end the conversation.
+    if (conv.user.storage.userName) {
+        const name = conv.user.storage.userName;
+        conv.ask(`<speak>${name}, your lucky number is ${luckyNumber} .<audio src="${audioSound}></audio></speak>`);
+    } else {
+        conv.ask(`<speak>Your lucky number is ${luckyNumber} .<audio src="${audioSound}></audio></speak>`);
+    }
+
+    conv.close(‘Good bye, see you next time.');
+});
+```
+
 
 
 ### Part Four: References
